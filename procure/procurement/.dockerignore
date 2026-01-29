@@ -1,0 +1,9 @@
+target
+.git
+.idea
+.mvn
+mvnw
+mvnw.cmd
+*.iml
+deploy_gcp_vm.ps1
+deploy.zip
