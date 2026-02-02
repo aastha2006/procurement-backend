@@ -10,6 +10,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -91,9 +92,6 @@ public class Authservice {
         SocietyUser employee = employeeRepo.findByEmail(email)
                 .orElseThrow(() -> new NoSuchElementException("Employee doesn't exists with this email " + email));
         return employee;
-
-        return employee;
-    }
 
     public Map<String, Object> getSessionDebugInfo(String username, String loginType) {
         AppUser user = userLoginRepo.findByUsernameAndLoginType(username, loginType);

@@ -183,27 +183,6 @@ public class AuthenticationController {
         return ResponseEntity.ok(masterService.getloggedUserDetail(email, loginType));
     }
 
-    @GetMapping("/debug-session/{username}")
-    public ResponseEntity<Map<String, Object>> getSessionInfo(@PathVariable String username,
-            @RequestParam String loginType) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            // Basic fetch from repo
-            // Note: Controller shouldn't call Repo directly ideally, using Service
-            // reflectively or Service helper
-            // But for debug, we assume masterService has a helper or we add it quickly.
-            // Let's use masterService.getloggedUserDetail technique or just add a quick
-            // method in Service.
-            // Wait, masterService is Authservice.
-            // Let's hack it: AuthService doesn't 'get' session.
-            // Adding a method to AuthService first is better.
-            response.put("message", "Use the logs. Explicit endpoint requires service update.");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(null);
-        }
-    }
-
     // Password Policy Validation check
     @GetMapping("/passwordpolicy/{email}")
     public ResponseEntity<Object> checkPasswordPolicy(@PathVariable String email, @RequestParam String password,
