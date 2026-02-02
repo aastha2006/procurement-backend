@@ -296,7 +296,21 @@ public class Authservice {
                 // password.");
                 // }
                 // ✅ Successful login
+
+                // SINGLE SESSION CHECK
+                if (user.getActiveSessionId() != null &&
+                        user.getActiveSessionExpiry() != null &&
+                        user.getActiveSessionExpiry().isAfter(LocalDateTime.now())) {
+                    throw new RuntimeException(
+                            "Login denied: User already logged in on another device. Please logout from the other device first or wait for the session to expire.");
+                }
+
                 user.setFailedAttempts(0);
+
+                // Set new session
+                user.setActiveSessionId(UUID.randomUUID().toString());
+                user.setActiveSessionExpiry(LocalDateTime.now().plusMinutes(30)); // Session valid for 30 mins
+
                 userLoginRepo.save(user);
                 token = jwtUtils.generateJwtToken(user);
                 // save the refresh token in database along with user
@@ -314,12 +328,28 @@ public class Authservice {
                 }
 
                 userLoginRepo.save(user);
+
+                if (user.getFailedAttempts() >= 3) {
+                    throw new InvalidcredentialException("Invalid Credentials. Failed attempts: "
+                            + user.getFailedAttempts()
+                            + ". Warning: Account will be locked after 5 failed attempts. Consider using 'Forgot Password'.");
+                }
+
                 throw new InvalidcredentialException(" Invalid Credentials, Please check password !!");
             }
 
         } else
             throw new RuntimeException(" User doesn't exist !!");
 
+    }
+
+    public void logoutUser(String username, String loginType) {
+        AppUser user = userLoginRepo.findByUsernameAndLoginType(username, loginType);
+        if (user != null) {
+            user.setActiveSessionId(null);
+            user.setActiveSessionExpiry(null);
+            userLoginRepo.save(user);
+        }
     }
 
     public void saveRefreshToken(Map<String, String> token, AppUser user) {

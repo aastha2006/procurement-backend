@@ -87,11 +87,20 @@ public class AuthenticationController {
         }
 
         catch (InvalidcredentialException iexcp) {
-            returnResponse.setMessage("Invalid Credentilas !!");
+            returnResponse.setMessage(iexcp.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(returnResponse);
         } catch (TempPasswordException iexcp) {
             returnResponse.setMessage("Temporary password used. Please change your password.");
             return ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED).body(returnResponse);
+        } catch (RuntimeException re) {
+            if (re.getMessage() != null && re.getMessage().contains("Login denied")) {
+                returnResponse.setMessage(re.getMessage());
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(returnResponse); // 409 Conflict
+            }
+            // Retain original behavior for other RuntimeExceptions
+            re.printStackTrace();
+            returnResponse.setMessage("Internal authentication error");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(returnResponse);
         } catch (Exception e) {
             // 👇 THIS is what was missing
             e.printStackTrace();
@@ -112,6 +121,12 @@ public class AuthenticationController {
         returnResponse.setRefreshtoken(token.get("refresh_token"));
         returnResponse.setMessage("Successful refreshed accesstoken");
         return ResponseEntity.ok(returnResponse);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestParam String username, @RequestParam String loginType) {
+        masterService.logoutUser(username, loginType);
+        return ResponseEntity.ok(new ApiResponse(true, "Logged out successfully"));
     }
 
     @PostMapping("/forgot-password")
