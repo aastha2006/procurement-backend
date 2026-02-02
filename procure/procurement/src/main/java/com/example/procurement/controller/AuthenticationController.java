@@ -190,6 +190,14 @@ public class AuthenticationController {
         return ResponseEntity.ok(masterService.checkPasswordPolicy(email, password, username));
     }
 
+    @GetMapping("/version")
+    public ResponseEntity<Map<String, String>> getVersion() {
+        Map<String, String> response = new HashMap<>();
+        response.put("version", "1.0-DEBUG-SESSION-FIX-EPOCH");
+        response.put("timestamp", ZonedDateTime.now().toString());
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/debug-session/{username}")
     public ResponseEntity<Map<String, Object>> getSessionInfo(@PathVariable String username,
             @RequestParam String loginType) {

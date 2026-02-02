@@ -54,7 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
                 System.out.println("DEBUG: Auth failure for URI: " + requestURI);
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Missing or invalid authorization header");
+                response.getWriter().write("Missing or invalid authorization header for URI: " + requestURI);
                 return;
             }
 
@@ -112,6 +112,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 || uri.endsWith("/login")
                 || uri.endsWith("/register")
                 || uri.startsWith("/api/auth/debug-session/") // Skip filter entirely for debug
+                || uri.endsWith("/version") // Version check
                 || uri.equals("/api/PurchaseOrder/SapPo")
                 || "OPTIONS".equalsIgnoreCase(request.getMethod());
     }
