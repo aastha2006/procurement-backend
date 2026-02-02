@@ -314,10 +314,15 @@ public class Authservice {
                 user.setFailedAttempts(0);
 
                 // Set new session
-                user.setActiveSessionId(UUID.randomUUID().toString());
-                user.setActiveSessionExpiry(LocalDateTime.now().plusMinutes(30)); // Session valid for 30 mins
+                String newSessionId = UUID.randomUUID().toString();
+                System.out.println("Generating New Session ID: " + newSessionId);
+                user.setActiveSessionId(newSessionId);
+                user.setActiveSessionExpiry(LocalDateTime.now().plusMinutes(30));
 
-                userLoginRepo.save(user);
+                System.out.println("Saving user with new session...");
+                userLoginRepo.saveAndFlush(user); // Force flush
+                System.out.println("User saved. Active Session ID in Object: " + user.getActiveSessionId());
+
                 token = jwtUtils.generateJwtToken(user);
                 // save the refresh token in database along with user
                 saveRefreshToken(token, user);
