@@ -298,9 +298,15 @@ public class Authservice {
                 // ✅ Successful login
 
                 // SINGLE SESSION CHECK
+                System.out.println("Processing Login for: " + nmLogin);
+                System.out.println("Current Active Session ID: " + user.getActiveSessionId());
+                System.out.println("Current Expiry: " + user.getActiveSessionExpiry());
+                System.out.println("Current Server Time: " + LocalDateTime.now());
+
                 if (user.getActiveSessionId() != null &&
                         user.getActiveSessionExpiry() != null &&
                         user.getActiveSessionExpiry().isAfter(LocalDateTime.now())) {
+                    System.out.println("LOGIN DENIED: Active session exists.");
                     throw new RuntimeException(
                             "Login denied: User already logged in on another device. Please logout from the other device first or wait for the session to expire.");
                 }
