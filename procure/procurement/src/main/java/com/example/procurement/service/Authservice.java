@@ -92,6 +92,7 @@ public class Authservice {
         SocietyUser employee = employeeRepo.findByEmail(email)
                 .orElseThrow(() -> new NoSuchElementException("Employee doesn't exists with this email " + email));
         return employee;
+    }
 
     public Map<String, Object> getSessionDebugInfo(String username, String loginType) {
         AppUser user = userLoginRepo.findByUsernameAndLoginType(username, loginType);
