@@ -43,6 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     requestURI.startsWith("/api/vendors/") ||
                     requestURI.startsWith("/api/members/") ||
                     requestURI.startsWith("/api/assessment/") ||
+                    requestURI.startsWith("/api/auth/debug-session/") || // Allowed for debugging
                     requestURI.startsWith("/api/workflow-executions/")) {
                 filterChain.doFilter(request, response);
                 return;
@@ -110,6 +111,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 || uri.startsWith("/v3/api-docs")
                 || uri.endsWith("/login")
                 || uri.endsWith("/register")
+                || uri.startsWith("/api/auth/debug-session/") // Skip filter entirely for debug
                 || uri.equals("/api/PurchaseOrder/SapPo")
                 || "OPTIONS".equalsIgnoreCase(request.getMethod());
     }
