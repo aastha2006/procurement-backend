@@ -92,6 +92,22 @@ public class Authservice {
                 .orElseThrow(() -> new NoSuchElementException("Employee doesn't exists with this email " + email));
         return employee;
 
+        return employee;
+    }
+
+    public Map<String, Object> getSessionDebugInfo(String username, String loginType) {
+        AppUser user = userLoginRepo.findByUsernameAndLoginType(username, loginType);
+        Map<String, Object> info = new HashMap<>();
+        if (user != null) {
+            info.put("username", user.getUsername());
+            info.put("activeSessionId", user.getActiveSessionId());
+            info.put("sessionExpiryEpoch", user.getSessionExpiryEpoch());
+            info.put("currentServerEpoch", System.currentTimeMillis());
+            info.put("activeSessionExpiry", user.getActiveSessionExpiry()); // Log old one too
+        } else {
+            info.put("error", "User not found");
+        }
+        return info;
     }
 
     public AppUser saveUserLogin(AppUser userlogin2) {
@@ -298,15 +314,16 @@ public class Authservice {
                 // ✅ Successful login
 
                 // SINGLE SESSION CHECK
+                long now = System.currentTimeMillis();
                 System.out.println("Processing Login for: " + nmLogin);
-                System.out.println("Current Active Session ID: " + user.getActiveSessionId());
-                System.out.println("Current Expiry: " + user.getActiveSessionExpiry());
-                System.out.println("Current Server Time: " + LocalDateTime.now());
+                System.out.println("Current Session ID: " + user.getActiveSessionId());
+                System.out.println("Current Epoch: " + user.getSessionExpiryEpoch());
+                System.out.println("Server Now: " + now);
 
                 if (user.getActiveSessionId() != null &&
-                        user.getActiveSessionExpiry() != null &&
-                        user.getActiveSessionExpiry().isAfter(LocalDateTime.now())) {
-                    System.out.println("LOGIN DENIED: Active session exists.");
+                        user.getSessionExpiryEpoch() != null &&
+                        user.getSessionExpiryEpoch() > now) {
+                    System.out.println("LOGIN DENIED: Session Active and Not Expired.");
                     throw new RuntimeException(
                             "Login denied: User already logged in on another device. Please logout from the other device first or wait for the session to expire.");
                 }
@@ -317,11 +334,12 @@ public class Authservice {
                 String newSessionId = UUID.randomUUID().toString();
                 System.out.println("Generating New Session ID: " + newSessionId);
                 user.setActiveSessionId(newSessionId);
-                user.setActiveSessionExpiry(LocalDateTime.now().plusMinutes(30));
+                // 30 minutes * 60 seconds * 1000 millis
+                user.setSessionExpiryEpoch(now + (30 * 60 * 1000));
 
-                System.out.println("Saving user with new session...");
-                userLoginRepo.saveAndFlush(user); // Force flush
-                System.out.println("User saved. Active Session ID in Object: " + user.getActiveSessionId());
+                System.out.println("Saving user with new session (Epoch)...");
+                userLoginRepo.saveAndFlush(user);
+                System.out.println("User saved.");
 
                 token = jwtUtils.generateJwtToken(user);
                 // save the refresh token in database along with user
@@ -358,7 +376,7 @@ public class Authservice {
         AppUser user = userLoginRepo.findByUsernameAndLoginType(username, loginType);
         if (user != null) {
             user.setActiveSessionId(null);
-            user.setActiveSessionExpiry(null);
+            user.setSessionExpiryEpoch(null); // Clear Epoch
             userLoginRepo.save(user);
         }
     }

@@ -85,6 +85,10 @@ public class AppUser implements UserDetails {
   @Column(name = "active_session_id")
   private String activeSessionId;
 
+  // Switched to Epoch Millis to avoid Timezone issues
+  @Column(name = "session_expiry_epoch")
+  private Long sessionExpiryEpoch;
+
   @Column(name = "active_session_expiry")
   private LocalDateTime activeSessionExpiry;
 
