@@ -43,6 +43,8 @@ public class JwtUtils {
 
     // Create access token with claims
     private String createAccessToken(AppUser userDetails) {
+        System.out.println("DEBUG: Generating Token for " + userDetails.getUsername() + " Group: "
+                + (userDetails.getIdGroup() != null ? userDetails.getIdGroup().getName() : "NULL"));
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .claim("roles", userDetails.getAuthorities().stream()
@@ -53,9 +55,11 @@ public class JwtUtils {
                 .claim("group", userDetails.getIdGroup() != null ? userDetails.getIdGroup().getId() : null)
                 .claim("groupName", userDetails.getIdGroup() != null ? userDetails.getIdGroup().getName() : null)
                 .claim("Enable", userDetails.getEnabled())
+                .claim("Enable", userDetails.getEnabled())
                 .claim("loginType", userDetails.getLoginType())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                // HARDCODED 5 MINS FOR TESTING (User reported config not updating)
+                .setExpiration(new Date(System.currentTimeMillis() + 300000))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
