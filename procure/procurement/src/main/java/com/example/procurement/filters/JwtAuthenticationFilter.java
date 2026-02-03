@@ -43,7 +43,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     requestURI.startsWith("/api/vendors/") ||
                     requestURI.startsWith("/api/members/") ||
                     requestURI.startsWith("/api/assessment/") ||
+                    requestURI.startsWith("/api/assessment/") ||
                     requestURI.startsWith("/api/auth/debug-session/") || // Allowed for debugging
+                    requestURI.contains("/version") || // Explicit allow for version check
                     requestURI.startsWith("/api/workflow-executions/")) {
                 filterChain.doFilter(request, response);
                 return;
