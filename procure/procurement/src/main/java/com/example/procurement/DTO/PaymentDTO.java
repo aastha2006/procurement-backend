@@ -1,4 +1,4 @@
-package com.example.procurement.dto;
+package com.example.procurement.DTO;
 
 import lombok.Builder;
 import lombok.Data;

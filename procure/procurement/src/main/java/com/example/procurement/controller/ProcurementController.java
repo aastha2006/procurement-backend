@@ -19,7 +19,7 @@ import com.example.procurement.DTO.RFQRequest;
 import com.example.procurement.DTO.RfqComparisonResponse;
 import com.example.procurement.DTO.SelectVendorRequest;
 import com.example.procurement.DTO.SubmitQuotationDto;
-import com.example.procurement.dto.PaymentDTO;
+import com.example.procurement.DTO.PaymentDTO;
 import com.example.procurement.entity.GoodsReceipt;
 import com.example.procurement.entity.Invoice;
 import com.example.procurement.entity.Payment;
