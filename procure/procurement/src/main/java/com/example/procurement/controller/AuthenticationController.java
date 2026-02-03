@@ -115,12 +115,19 @@ public class AuthenticationController {
         LoginResponse returnResponse = new LoginResponse();
         String refreshToken = request.get("refreshtoken");
 
-        Map<String, String> token = masterService.verifyRefreshToken(refreshToken);
+        try {
+            Map<String, String> token = masterService.verifyRefreshToken(refreshToken);
 
-        returnResponse.setAccesstoken(token.get("access_token"));
-        returnResponse.setRefreshtoken(token.get("refresh_token"));
-        returnResponse.setMessage("Successful refreshed accesstoken");
-        return ResponseEntity.ok(returnResponse);
+            returnResponse.setAccesstoken(token.get("access_token"));
+            returnResponse.setRefreshtoken(token.get("refresh_token"));
+            returnResponse.setMessage("Successful refreshed accesstoken");
+            return ResponseEntity.ok(returnResponse);
+        } catch (Exception e) {
+            // Check for known exceptions from Authservice
+            Map<String, String> error = new HashMap<>();
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+        }
     }
 
     @PostMapping("/logout")
