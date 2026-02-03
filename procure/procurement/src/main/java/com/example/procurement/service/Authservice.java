@@ -322,9 +322,10 @@ public class Authservice {
                 if (user.getActiveSessionId() != null &&
                         user.getSessionExpiryEpoch() != null &&
                         user.getSessionExpiryEpoch() > now) {
-                    System.out.println("LOGIN DENIED: Session Active and Not Expired.");
-                    throw new RuntimeException(
-                            "Login denied: User already logged in on another device. Please logout from the other device first or wait for the session to expire.");
+                    System.out.println("LOGIN: Overwriting previous active session.");
+                    // OLD BEHAVIOR: Throw Exception
+                    // NEW BEHAVIOR: Allow login, effectively kicking out the old session (by
+                    // changing sessionId)
                 }
 
                 user.setFailedAttempts(0);
@@ -402,6 +403,7 @@ public class Authservice {
         refreshTokenRepository.save(refreshToken);
     }
 
+    @Transactional
     public Map<String, String> verifyRefreshToken(String refreshToken) {
 
         RefreshToken existrefreshToken = refreshTokenRepository.findByToken(refreshToken)
@@ -409,6 +411,12 @@ public class Authservice {
 
         if (existrefreshToken.getExpiryDate().isBefore(Instant.now())) {
             throw new RuntimeException("Refresh Token Expired");
+        }
+
+        // Force initialization of lazy-loaded group if needed avoiding
+        // LazyInitializationException
+        if (existrefreshToken.getUser().getIdGroup() != null) {
+            existrefreshToken.getUser().getIdGroup().getName();
         }
 
         Map<String, String> token = jwtUtils.generateJwtToken(existrefreshToken.getUser());
