@@ -18,7 +18,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
-
 @Component
 public class JwtUtils {
 
@@ -38,7 +37,7 @@ public class JwtUtils {
         Map<String, String> tokens = new HashMap<>();
         tokens.put("access_token", accessToken);
         tokens.put("refresh_token", refreshToken);
-    tokens.put("refreshExpirytime", String.valueOf(System.currentTimeMillis() + refreshTokenExpiration));
+        tokens.put("refreshExpirytime", String.valueOf(System.currentTimeMillis() + refreshTokenExpiration));
         return tokens;
     }
 
@@ -51,8 +50,8 @@ public class JwtUtils {
                         .toList())
                 .claim("email", userDetails.getEmail())
                 .claim("id", userDetails.getId())
-                .claim("group", userDetails.getIdGroup().getId())
-                .claim("groupName", userDetails.getIdGroup().getName())
+                .claim("group", userDetails.getIdGroup() != null ? userDetails.getIdGroup().getId() : null)
+                .claim("groupName", userDetails.getIdGroup() != null ? userDetails.getIdGroup().getName() : null)
                 .claim("Enable", userDetails.getEnabled())
                 .claim("loginType", userDetails.getLoginType())
                 .setIssuedAt(new Date())
