@@ -20,10 +20,10 @@ public class RefreshToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @jakarta.persistence.Column(columnDefinition = "TEXT")
     private String token;
     private Instant expiryDate;
 
     @OneToOne
     private AppUser user;
 }
-

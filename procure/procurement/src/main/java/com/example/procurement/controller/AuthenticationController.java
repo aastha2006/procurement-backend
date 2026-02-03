@@ -123,6 +123,8 @@ public class AuthenticationController {
             returnResponse.setMessage("Successful refreshed accesstoken");
             return ResponseEntity.ok(returnResponse);
         } catch (Exception e) {
+            System.out.println("DEBUG: Refresh Token Failed: " + e.getMessage());
+            e.printStackTrace();
             // Check for known exceptions from Authservice
             Map<String, String> error = new HashMap<>();
             error.put("message", e.getMessage());
