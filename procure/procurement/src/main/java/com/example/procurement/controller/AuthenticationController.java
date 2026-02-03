@@ -200,7 +200,7 @@ public class AuthenticationController {
     @GetMapping("/version")
     public ResponseEntity<Map<String, String>> getVersion() {
         Map<String, String> response = new HashMap<>();
-        response.put("version", "1.0-DEBUG-SESSION-FIX-EPOCH");
+        response.put("version", "1.2-HARDCODE-5MIN");
         response.put("timestamp", ZonedDateTime.now().toString());
         return ResponseEntity.ok(response);
     }
